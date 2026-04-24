@@ -12,4 +12,4 @@ with methodology notes and real-world application context.
 
 |Pentesting Fundamentals|Jr Pen Tester 1|April 23, 2026|Ehtics & Methodologies|
 
-| (updating as completed) | | | |
+| (updating as completed) | 
