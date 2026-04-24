@@ -63,7 +63,7 @@ This is the key behavior to understand: the shell interprets `-` as a convention
 By prepending `./` we tell the shell this is a path relative to the current directory — not a flag or stdin indicator:
 
 ```bash
-cat ./-
+cat ./-       OR    cat ~/-
 ```
 
 Output:
