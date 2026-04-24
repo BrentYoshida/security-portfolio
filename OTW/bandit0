@@ -43,7 +43,9 @@ ssh bandit0@bandit.labs.overthewire.org -p 2220
 - `bandit0@bandit.labs.overthewire.org` — username @ target host
 - `-p 2220` — specifies non-default port
 
-When prompted, accept the host key fingerprint (type `yes`) and enter the password `bandit0`.
+When prompted, accept the host key fingerprint (type `yes`) and enter the password `bandit0`. Click ENTER once pw has been typed in.
+Note: you will not be able to see '*' or any addition of keystrokes when typing in pw. 
+Letters are hidden
 
 ### Step 3 — Confirm successful connection
 
