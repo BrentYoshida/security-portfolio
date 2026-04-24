@@ -64,10 +64,14 @@ Exactly what you'd expect. The shell split the filename on whitespace and passed
 
 ### Step 4 — Solution: quote the filename
 
+I added the ./ between the cat command and the quotes:   cat ./"--spaces in this filename--"
+If you don't put the ./, an error "unrecognized option" occurs because the cat command interprets the dashes (--) 
+and spaces at the beginning of the filename as command-line arguments rather than the file name itself.
+
 Wrapping the full filename in quotes tells the shell to treat everything inside as a single argument:
 
 ```bash
-cat "spaces in this filename"
+cat ./"--spaces in this filename--"
 ```
 
 Output:
