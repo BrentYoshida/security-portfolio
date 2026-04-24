@@ -7,5 +7,5 @@ pentest application of the concept.
 ## Bandit Progress
 | Level | Concept | Date | Write-up |
 |-------|---------|------|----------|
-| Level 0 | SSH basics | April 2026 | [Link](./Bandit/level-00.md) |
-| Level 1 | Non-standard filenames | April 2026 | [Link](./Bandit/level-01.md) |
+| Level 0 | SSH basics | April 2026 | [Link](OTW/bandit0) |
+| Level 1 | Non-standard filenames | April 2026 | [Link]() |
