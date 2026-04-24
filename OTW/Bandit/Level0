@@ -1,0 +1,118 @@
+# Bandit Level 0 → Level 1
+**Platform:** OverTheWire — Bandit  
+**Date:** April 2026  
+**Concept:** SSH authentication and remote host connection  
+
+---
+
+## Objective
+
+Connect to the Bandit game server via SSH using provided credentials and retrieve the password stored in a file called `readme` in the home directory.
+
+**Given:**
+- Host: `bandit.labs.overthewire.org`
+- Port: `2220`
+- Username: `bandit0`
+- Password: `bandit0`
+
+---
+
+## Concepts Tested
+
+- SSH (Secure Shell) — encrypted remote terminal protocol
+- Non-standard port connection
+- Basic home directory navigation
+- Reading file contents from the command line
+
+---
+
+## Methodology
+
+### Step 1 — Identify the connection requirements
+
+The challenge specifies a non-standard SSH port (2220 instead of the default 22). This is immediately relevant — many services in real environments run on non-default ports as a basic obscurity measure. A default Nmap scan without `-p-` or specific port flags would miss this.
+
+### Step 2 — Connect via SSH
+
+```bash
+ssh bandit0@bandit.labs.overthewire.org -p 2220
+```
+
+**Flag breakdown:**
+- `ssh` — initiates Secure Shell connection
+- `bandit0@bandit.labs.overthewire.org` — username @ target host
+- `-p 2220` — specifies non-default port
+
+When prompted, accept the host key fingerprint (type `yes`) and enter the password `bandit0`.
+
+### Step 3 — Confirm successful connection
+
+Successful login drops into a shell prompt:
+
+```
+bandit0@bandit:~$
+```
+
+The `~` confirms we are in the home directory (`/home/bandit0`).
+
+### Step 4 — List directory contents
+
+```bash
+ls
+```
+
+Output:
+```
+readme
+```
+
+One file present. Named exactly as the challenge described.
+
+### Step 5 — Read the file
+
+```bash
+cat readme
+```
+
+Output:
+```
+NH2SXQwcBdpmTEzi3bvBHMM9H66vVXjL
+```
+
+This is the password for `bandit1`.
+
+---
+
+## Commands Used
+
+| Command | Purpose |
+|---------|---------|
+| `ssh user@host -p PORT` | Connect to remote host via SSH on non-default port |
+| `ls` | List contents of current directory |
+| `cat filename` | Print file contents to terminal |
+
+---
+
+## What Went Smoothly
+
+Connection was straightforward once the non-standard port flag was identified. The `-p` flag is easy to overlook if you default to assuming port 22 — worth making a habit of always checking specified port requirements before connecting.
+
+---
+
+## Real-World Pentest Application
+
+**SSH on non-standard ports** is extremely common in real environments. During an Nmap scan on an engagement, services running on unexpected ports are high-value findings — administrators often move SSH to a non-standard port thinking it reduces attack surface (security through obscurity). It doesn't prevent exploitation but it does mean you need to run full port range scans (`nmap -p-`) to find it.
+
+**`cat` for credential harvesting** — reading files in home directories and common locations (`/home`, `/root`, `/var/www`, `/etc`) is a core post-exploitation habit. Configuration files, `.bash_history`, `.ssh/authorized_keys`, and credential files are frequently found this way after gaining initial access.
+
+---
+
+## Key Takeaway
+
+The `-p` flag for SSH is the only non-obvious piece of this level. The real lesson is building the habit of reading challenge requirements carefully before connecting — missing a port specification, a username, or a protocol detail in a real engagement wastes time and creates noise in logs.
+
+**Next:** [Bandit Level 1 → 2](./level-01.md)
+
+---
+
+*Part of the [Offensive Security Portfolio](../../README.md) — OverTheWire Bandit series*
