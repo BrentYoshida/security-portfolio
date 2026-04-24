@@ -17,5 +17,5 @@ pentest application of the concept.
 | Level 7| Grep | April 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/Bandit/level-07.md) |
 | Level 8 | Sort & uniq -u | April 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/Bandit/level-08.md) |
 | Level 9 | Strings & Grep "==" | April 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/Bandit/level-09.md) |
-| Level 10 | Base64 -d | April 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/Bandit/level-10.md) |
+| Level 10 | Base64 + Decoding | April 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/Bandit/level-10.md) |
 I'll continue to add as I go along
