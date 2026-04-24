@@ -10,6 +10,6 @@ with methodology notes and real-world application context.
 ## Completed Rooms
 | Room | Path | Date | Concept |
 
-|Pentesting Fundamentals|Jr Pen Tester 1|April 23, 2026|Ehtics & Methodologies|
+| Pentesting Fundamentals | Jr Pen Tester 1 | April 23, 2026 | Ehtics & Methodologies |
 
 | (updating as completed) | 
