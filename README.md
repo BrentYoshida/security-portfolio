@@ -14,7 +14,7 @@ operations. Active since April 2026.
 | OSCP | 🎯 Planned | Est. Late 2026 |
 
 ## Platforms
-- **HackTheBox** — 
+- **HackTheBox** — 4 machines from Level 0 complete. Starting Level 1
 - **TryHackMe** — Jr. Penetration Tester path (in progress)
 - **OverTheWire** — Bandit Levels 0–13
 
