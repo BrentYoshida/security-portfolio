@@ -21,6 +21,7 @@ operations. Active since April 2026.
 ## Repository Structure
 | Folder | Contents |
 |--------|----------|
+| `/certifications` | Experiences, assessment of material, bigger picture connection |
 | `/HTB` | HackTheBox machine write-ups |
 | `/THM` | TryHackMe path completions and room notes |
 | `/OTW` | OverTheWire Bandit write-ups |
