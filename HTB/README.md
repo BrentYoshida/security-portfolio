@@ -8,3 +8,9 @@ key takeaways. All machines are retired at time of posting.
 
 | Meow | Very Easy | Unix | April 2026 | Service enumeration, Telnet, default credentials |
 
+| Fawn | Very Easy | Unix | April 2026 |  |
+
+| Meow | Very Easy | Unix | April 2026 |  |
+
+| Meow | Very Easy | Unix | April 2026 |  |
+
