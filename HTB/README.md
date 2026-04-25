@@ -8,9 +8,9 @@ key takeaways. All machines are retired at time of posting.
 
 | Meow | Very Easy | Unix | April 2026 | Service enumeration, Telnet, default credentials |
 
-| Fawn | Very Easy | Unix | April 2026 |  |
+| Fawn | Very Easy | Unix | April 2026 | FTP enumeration, anonymous authentication, file retrieval |
 
-| Meow | Very Easy | Unix | April 2026 |  |
+| Dancing | Very Easy | Windows | April 2026 | SMB enumeration, null authentication, share access |
 
-| Meow | Very Easy | Unix | April 2026 |  |
+| Redeemer | Very Easy | Linux | April 2026 | Redis enumeration, unauthenticated access, in-memory database extraction |
 
