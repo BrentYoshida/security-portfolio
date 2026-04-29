@@ -7,11 +7,11 @@ operations. Active since April 2026.
 ## Certifications
 | Cert | Status | Date |
 |------|--------|------|
-| Google Cybersecurity Certificate | ✅ Complete | April 2026 |
-| ISC2 CC (Certified in Cybersecurity) | 🔄 Exam Pending | April 2026 |
-| CompTIA Security+ | 📚 In Progress | Est. May 2026 |
-| eJPT | 🎯 Planned | Est. June 2026 |
-| OSCP | 🎯 Planned | Est. Late 2026 |
+| Google Cybersecurity Certificate | Complete | April 2026 |
+| ISC2 CC (Certified in Cybersecurity) | Exam Pending | April 2026 |
+| CompTIA Security+ | In Progress | Est. May 2026 |
+| eJPT | Planned | Est. June 2026 |
+| OSCP | Planned | Est. Late 2026 |
 
 ## Platforms
 - **HackTheBox**: 4 machines from Level 0 complete. Starting Level 1
