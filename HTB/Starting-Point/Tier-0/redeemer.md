@@ -170,7 +170,7 @@ redis-cli -h [IP] --scan | xargs redis-cli -h [IP] get
 
 ## Key Takeaway
 
-Always run `-p-`. Non-standard ports hide critical services that default scans miss entirely. Unauthenticated Redis is a critical finding : not just for data extraction but as a potential path to full system compromise depending on how the service is configured. The `info` → `select` → `keys *` → `get` sequence is the complete Redis enumeration workflow.
+Always run `-p-`. Non-standard ports hide critical services that default scans miss entirely. Unauthenticated Redis is a critical finding : not just for data extraction but as a potential path to full system compromise depending on how the service is configured. The `info` > `select` > `keys *` > `get` sequence is the complete Redis enumeration workflow.
 
 **Tier 0 complete.**
 
