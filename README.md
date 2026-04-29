@@ -1,4 +1,4 @@
-# Brent Yoshida — Offensive Security Portfolio
+# Brent Yoshida: Offensive Security Portfolio
 
 Documenting my progression from foundational Linux/networking 
 fundamentals through penetration testing and physical red team 
@@ -14,9 +14,9 @@ operations. Active since April 2026.
 | OSCP | 🎯 Planned | Est. Late 2026 |
 
 ## Platforms
-- **HackTheBox** — 4 machines from Level 0 complete. Starting Level 1
-- **TryHackMe** — Jr. Penetration Tester path (in progress)
-- **OverTheWire** — Bandit Levels 0–13
+- **HackTheBox**: 4 machines from Level 0 complete. Starting Level 1
+- **TryHackMe**: Jr. Penetration Tester path (in progress)
+- **OverTheWire**: Bandit Levels 0–13
 
 ## Repository Structure
 | Folder | Contents |
@@ -30,9 +30,9 @@ operations. Active since April 2026.
 | `/bug-bounty` | Bug bounty reports and recon notes |
 
 ## Current Focus
-- Completing TryHackMe Jr. Penetration Tester path → PT! cert
+- Completing TryHackMe Jr. Penetration Tester path > PT! cert
 - CompTIA Security+ exam preparation
-- HackTheBox machine progression (Easy → Medium)
+- HackTheBox machine progression (Easy > Medium)
 - OverTheWire Bandit documentation
 
 ## Contact
