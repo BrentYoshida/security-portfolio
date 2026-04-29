@@ -1,6 +1,6 @@
 # Brent Yoshida: Offensive Security Portfolio
 
-About: Career changer pivoting to offensive security from 15 plus years in marketing leadership and on-camera brand work. USC Architecture graduate (B.Arch) with two Rose Bowl seasons on the football team and Kickoff Coverage starter for 8 of 13 games. Building this portfolio publicly to document the journey from foundational Linux to professional pen testing. Targeting OSCP early 2027 with a longer-term focus on physical red team and adversary emulation. Activated April 2026
+About: Career changer pivoting to offensive security from 15 plus years in marketing leadership and on-camera brand work. USC Architecture graduate (B.Arch) with two Rose Bowl Championship seasons on the football team and Kickoff Coverage starter for 8 of 13 games. Building this portfolio publicly to document the journey from foundational Linux to professional pen testing. Targeting OSCP early 2027 with a longer-term focus on physical red team and adversary emulation. Activated April 2026
 
 ## Certifications
 | Cert | Status | Date |
