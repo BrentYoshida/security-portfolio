@@ -1,5 +1,5 @@
-# Bandit Level 0 → Level 1
-**Platform:** OverTheWire — Bandit  
+# Bandit Level 0 > Level 1
+**Platform:** OverTheWire: Bandit  
 **Date:** April 2026  
 **Concept:** SSH authentication and remote host connection  
 
@@ -19,7 +19,7 @@ Connect to the Bandit game server via SSH using provided credentials and retriev
 
 ## Concepts Tested
 
-- SSH (Secure Shell) — encrypted remote terminal protocol
+- SSH (Secure Shell): encrypted remote terminal protocol
 - Connecting on non-standard ports
 - Basic home directory navigation
 - Reading file contents from the command line
@@ -28,17 +28,17 @@ Connect to the Bandit game server via SSH using provided credentials and retriev
 
 ## Methodology
 
-### Step 1 — Connect via SSH
+### Step 1: Connect via SSH
 
 ```bash
 ssh bandit0@bandit.labs.overthewire.org -p 2220
 ```
 
-The non-standard port is the only thing worth pausing on here. Default SSH runs on 22 — this one is 2220. Easy to miss if you're moving fast and default to `ssh bandit0@host` without reading the spec.
+The non-standard port is the only thing worth pausing on here. Default SSH runs on 22, this one is 2220. Easy to miss if you're moving fast and default to `ssh bandit0@host` without reading the spec.
 
 Accept the host key fingerprint (`yes`) and enter the password `bandit0` when prompted.
 
-### Step 2 — Look around
+### Step 2: Look around
 
 ```bash
 ls
@@ -51,7 +51,7 @@ readme
 
 One file. Exactly what the challenge described. Good sign.
 
-### Step 3 — Read it
+### Step 3: Read it
 
 ```bash
 cat readme
@@ -92,7 +92,7 @@ Straightforward level — no wrong turns. The only thing to note is that typing 
 
 ## Key Takeaway
 
-Level 0 is about establishing the connection pattern that every subsequent level builds on. The `-p` flag for non-standard ports is the one thing to internalize — it's a small detail that comes up constantly in both CTFs and real engagements.
+Level 0 is about establishing the connection pattern that every subsequent level builds on. The `-p` flag for non-standard ports is the one thing to internalize; it's a small detail that comes up constantly in both CTFs and real engagements.
 
 **Next:** [Bandit Level 1 → 2](./level-01.md)
 
