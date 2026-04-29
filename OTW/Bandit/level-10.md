@@ -1,5 +1,5 @@
-# Bandit Level 10 → Level 11
-**Platform:** OverTheWire — Bandit  
+# Bandit Level 10 > Level 11
+**Platform:** OverTheWire : Bandit  
 **Date:** April 2026  
 **Concept:** Base64 encoding and decoding  
 
@@ -25,9 +25,9 @@ Log in as `bandit10` and decode the base64 encoded contents of `data.txt` to ret
 
 ---
 
-## Background — What is Base64?
+## Background : What is Base64?
 
-Before running anything I looked this one up. Base64 is a binary-to-text encoding scheme that translates raw binary data into a printable ASCII string format. It uses 64 characters — uppercase A–Z, lowercase a–z, digits 0–9, plus `+` and `/` — to represent data that would otherwise contain unprintable or unsafe bytes.
+Before running anything I looked this one up. Base64 is a binary-to-text encoding scheme that translates raw binary data into a printable ASCII string format. It uses 64 characters : uppercase A–Z, lowercase a–z, digits 0–9, plus `+` and `/` : to represent data that would otherwise contain unprintable or unsafe bytes.
 
 The reason it exists: many systems (email protocols, URLs, HTTP headers) were designed to handle text only. Binary data doesn't survive transport through those systems intact. Base64 solves that by converting anything into a safe, predictable character set.
 
@@ -37,7 +37,7 @@ Important distinction: **base64 is encoding, not encryption.** It's a transforma
 
 ## Methodology
 
-### Step 1 — Connect and look around
+### Step 1 : Connect and look around
 
 ```bash
 ssh bandit10@bandit.labs.overthewire.org -p 2220
@@ -49,7 +49,7 @@ Output:
 data.txt
 ```
 
-### Step 2 — Read the file
+### Step 2 : Read the file
 
 ```bash
 cat data.txt
@@ -60,9 +60,9 @@ Output:
 VGhlIHBhc3N3b3JkIGlzIGR0UjE3M2ZaS2IwUlJzREZTR3NnMlJXbnBOVmozcVJyCg==
 ```
 
-The character set and `==` padding at the end confirm base64 immediately. The `=` padding is added to make the total length a multiple of 4 — a structural requirement of the encoding. Once you've seen it a few times it's recognizable at a glance.
+The character set and `==` padding at the end confirm base64 immediately. The `=` padding is added to make the total length a multiple of 4 : a structural requirement of the encoding. Once you've seen it a few times it's recognizable at a glance.
 
-### Step 3 — Decode it
+### Step 3 : Decode it
 
 ```bash
 cat data.txt | base64 -d
@@ -81,7 +81,7 @@ Password for `bandit11`: `dtR173fZKb0RRsDFSGsg2RWnpNVj3qRr`
 
 | Command | Purpose |
 |---------|---------|
-| `cat data.txt` | Read file — confirmed base64 encoding from character set and padding |
+| `cat data.txt` | Read file : confirmed base64 encoding from character set and padding |
 | `base64 -d` | Decode base64 encoded input |
 | `cat data.txt \| base64 -d` | Pipe file contents into decoder |
 
@@ -89,16 +89,16 @@ Password for `bandit11`: `dtR173fZKb0RRsDFSGsg2RWnpNVj3qRr`
 
 ## What I Tried First
 
-Straight to `base64 -d` once the encoding was confirmed visually. No dead ends here — the challenge description and the `==` padding made the approach obvious. The time went into understanding *what base64 is* before running the command, which felt more useful than just executing the solution.
+Straight to `base64 -d` once the encoding was confirmed visually. No dead ends here : the challenge description and the `==` padding made the approach obvious. The time went into understanding *what base64 is* before running the command, which felt more useful than just executing the solution.
 
 ---
 
 ## Real-World Pentest Application
 
-**Base64 is not encryption — and that matters constantly on real engagements.** Developers frequently store credentials in base64 under the mistaken assumption that it obscures them. It doesn't. Common places base64 credentials appear in the wild:
+**Base64 is not encryption : and that matters constantly on real engagements.** Developers frequently store credentials in base64 under the mistaken assumption that it obscures them. It doesn't. Common places base64 credentials appear in the wild:
 
 ```bash
-# HTTP Basic Authentication headers — trivially decoded
+# HTTP Basic Authentication headers : trivially decoded
 # Authorization: Basic dXNlcjpwYXNzd29yZA==
 echo "dXNlcjpwYXNzd29yZA==" | base64 -d
 # Output: user:password
@@ -113,18 +113,18 @@ cat ~/.docker/config.json | python3 -c "import sys,json,base64; d=json.load(sys.
 grep -r "BASE64\|_KEY\|_TOKEN" /var/www/ 2>/dev/null | awk -F= '{print $2}' | base64 -d 2>/dev/null
 ```
 
-The HTTP Basic Auth case is the most immediate. An Authorization header intercepted in Burp Suite or a packet capture that looks like `Basic dXNlcjpwYXNzd29yZA==` decodes to plaintext credentials in one command. No cracking, no tools — just `base64 -d`.
+The HTTP Basic Auth case is the most immediate. An Authorization header intercepted in Burp Suite or a packet capture that looks like `Basic dXNlcjpwYXNzd29yZA==` decodes to plaintext credentials in one command. No cracking, no tools : just `base64 -d`.
 
-**Recognize it on sight:** limited character set (A–Z, a–z, 0–9, +, /), length always a multiple of 4, trailing `=` or `==` padding. When you find what looks like a random string in a config file, environment variable, or HTTP header — run it through `base64 -d` before moving on. It's credentials more often than you'd expect.
+**Recognize it on sight:** limited character set (A–Z, a–z, 0–9, +, /), length always a multiple of 4, trailing `=` or `==` padding. When you find what looks like a random string in a config file, environment variable, or HTTP header : run it through `base64 -d` before moving on. It's credentials more often than you'd expect.
 
 ---
 
 ## Key Takeaway
 
-Base64 is a compatibility tool, not a security control. The moment you can identify it visually — character set, padding, length — the decode is one command. Never assume encoded means protected.
+Base64 is a compatibility tool, not a security control. The moment you can identify it visually : character set, padding, length : the decode is one command. Never assume encoded means protected.
 
 **Next:** [Bandit Level 11 → 12](./level-11.md)
 
 ---
 
-*Part of the [Offensive Security Portfolio](../../README.md) — OverTheWire Bandit series*
+*Part of the [Offensive Security Portfolio](../../README.md) : OverTheWire Bandit series*
