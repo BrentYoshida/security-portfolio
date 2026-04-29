@@ -1,4 +1,4 @@
-# OverTheWire — Bandit
+# OverTheWire: Bandit
 
 Linux fundamentals documentation. Each level written up 
 with the challenge, methodology, solution, and real-world 
