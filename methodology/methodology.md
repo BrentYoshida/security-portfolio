@@ -1,7 +1,7 @@
 # Penetration Testing Methodology
 **Author:** Brent Yoshida  
 **Created:** April 2026  
-**Status:** Living document — updated after every engagement, machine, and course  
+**Status:** Living document: updated after every engagement, machine, and course  
 
 ---
 
@@ -9,7 +9,7 @@
 
 Every system has a way in. The job is to find it before someone who shouldn't.
 
-This methodology isn't a checklist to race through — it's a thinking framework. The goal at every phase is to understand what you're looking at before deciding what to do with it. Rushing enumeration to get to exploitation is the fastest way to miss the finding that matters.
+This methodology isn't a checklist to race through; it's a thinking framework. The goal at every phase is to understand what you're looking at before deciding what to do with it. Rushing enumeration to get to exploitation is the fastest way to miss the finding that matters.
 
 Puzzles have always been the pull for me. This field is the largest, most consequential puzzle I've encountered. The methodology is how I make sure I'm solving it systematically rather than just getting lucky.
 
@@ -30,27 +30,27 @@ Notes taken during a session are more accurate than notes reconstructed afterwar
 A path that doesn't work tells you something. Document what you tried, what the response was, and what it implied. In a real engagement that failed attempt might be what identifies the actual attack surface. In a write-up it's what separates a methodology document from a tutorial.
 
 **Understand before moving on.**
-If a command worked but you don't know why, stop. Look it up. The goal isn't to collect flags — it's to build a transferable skill set. A technique understood at the mechanism level applies everywhere. A technique memorized as a sequence of commands applies only where you've seen it before.
+If a command worked but you don't know why, stop. Look it up. The goal isn't to collect flags; it's to build a transferable skill set. A technique understood at the mechanism level applies everywhere. A technique memorized as a sequence of commands applies only where you've seen it before.
 
 ---
 
-## Phase 1 — Reconnaissance
+## Phase 1: Reconnaissance
 
 ### Passive Recon
 Gather information without touching the target. No active connections. No scan traffic.
 
 ```bash
-# WHOIS — registrant info, nameservers, registration dates
+# WHOIS: registrant info, nameservers, registration dates
 whois [domain]
 
-# DNS records — A, MX, NS, TXT, zone transfer attempts
+# DNS records: A, MX, NS, TXT, zone transfer attempts
 dnsrecon -d [domain]
 
-# Subdomain enumeration — find assets not linked publicly
+# Subdomain enumeration: find assets not linked publicly
 ffuf -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
   -u http://[domain] -H "Host: FUZZ.[domain]"
 
-# Google dorks — find indexed sensitive content
+# Google dorks: find indexed sensitive content
 site:[domain] filetype:pdf
 site:[domain] inurl:admin
 site:[domain] "password" OR "credentials"
@@ -65,19 +65,19 @@ Direct interaction with the target begins here. Generates traffic and potentiall
 # Confirm host is live before anything else
 ping -c 4 [IP]
 
-# Initial scan — top 1000 ports, fast
+# Initial scan: top 1000 ports, fast
 nmap [IP]
 
-# ALWAYS follow with full port scan — non-standard ports are frequently where findings live
+# ALWAYS follow with full port scan: non-standard ports are frequently where findings live
 nmap -p- [IP]
 
 # Service version + default scripts + OS detection on discovered ports
 nmap -sV -sC -O -p [ports] [IP]
 
-# Save output — always
+# Save output: always
 nmap -sV -sC -oA recon/nmap_initial [IP]
 
-# UDP — slower but often overlooked
+# UDP: slower but often overlooked
 sudo nmap -sU --top-ports 100 [IP]
 ```
 
@@ -85,7 +85,7 @@ sudo nmap -sU --top-ports 100 [IP]
 
 ---
 
-## Phase 2 — Enumeration
+## Phase 2: Enumeration
 
 Enumeration is recon with depth. Where recon maps the surface, enumeration maps what's underneath.
 
@@ -117,7 +117,7 @@ nikto -h http://[IP] -o recon/nikto.txt
 ### SMB Enumeration
 
 ```bash
-# List shares — null session attempt
+# List shares: null session attempt
 smbclient -L [IP] -N
 
 # Detailed share and permission enumeration
@@ -154,13 +154,13 @@ redis-cli -h [IP] ping
 redis-cli -h [IP] info
 redis-cli -h [IP] keys *
 
-# SSH — version and supported auth methods
+# SSH: version and supported auth methods
 ssh -v [user]@[IP]
 
-# SMTP — user enumeration
+# SMTP: user enumeration
 smtp-user-enum -M VRFY -U /usr/share/seclists/Usernames/top-usernames-shortlist.txt -t [IP]
 
-# SNMP — community string check
+# SNMP: community string check
 snmpwalk -c public -v1 [IP]
 ```
 
@@ -168,7 +168,7 @@ snmpwalk -c public -v1 [IP]
 
 ---
 
-## Phase 3 — Exploitation
+## Phase 3: Exploitation
 
 Exploitation only begins after enumeration is thorough. The finding is almost always in the enumeration. The exploitation is just acting on it.
 
@@ -187,7 +187,7 @@ Exploitation only begins after enumeration is thorough. The finding is almost al
 searchsploit [service name]
 searchsploit [service] [version]
 
-# Copy exploit to working directory — never run from database path
+# Copy exploit to working directory: never run from database path
 searchsploit -m [exploit/path]
 
 # Check CVE details
@@ -201,7 +201,7 @@ searchsploit -m [exploit/path]
 # Manual testing in Burp Suite before automated tools
 # Proxy: 127.0.0.1:8080
 
-# SQL injection — test manually first
+# SQL injection: test manually first
 ' OR '1'='1
 ' OR '1'='1'--
 admin'--
@@ -237,7 +237,7 @@ run
 ### Credential Attacks
 
 ```bash
-# Default credentials — always try manually first
+# Default credentials: always try manually first
 # admin:admin, admin:password, root:(blank), administrator:administrator
 
 # Hydra SSH
@@ -250,7 +250,7 @@ hydra -l [user] -P /usr/share/wordlists/rockyou.txt [IP] \
 
 ---
 
-## Phase 4 — Post-Exploitation
+## Phase 4: Post-Exploitation
 
 Initial access is the beginning. Post-exploitation determines the actual impact.
 
@@ -306,7 +306,7 @@ ss -tulnp
 
 ---
 
-## Phase 5 — Privilege Escalation
+## Phase 5: Privilege Escalation
 
 ### Linux
 
@@ -320,7 +320,7 @@ find / -perm -4000 -type f 2>/dev/null
 # Writable files and directories owned by root
 find / -user root -writable -type f 2>/dev/null
 
-# Cron jobs — look for writable scripts being called as root
+# Cron jobs: look for writable scripts being called as root
 cat /etc/crontab
 ls -la /etc/cron*
 cat /var/spool/cron/crontabs/* 2>/dev/null
@@ -341,7 +341,7 @@ getcap -r / 2>/dev/null
 ### Windows
 
 ```bash
-# Current user and privileges — SeImpersonatePrivilege = potato attack
+# Current user and privileges: SeImpersonatePrivilege = potato attack
 whoami /all
 
 # System information and missing patches
@@ -365,27 +365,27 @@ reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallEle
 
 ---
 
-## Phase 6 — Reporting
+## Phase 6: Reporting
 
-The report is the deliverable. A successful exploitation that isn't documented clearly is worthless to the client — and worthless to the portfolio.
+The report is the deliverable. A successful exploitation that isn't documented clearly is worthless to the client, and worthless to the portfolio.
 
 ### Write-Up Structure (GitHub / Portfolio)
 
 Every machine and challenge gets a write-up. Minimum viable write-up is five sentences. Ideal write-up covers:
 
-1. **Objective** — what the target is and what success looks like
-2. **Enumeration** — what was found and how
-3. **Exploitation** — what vulnerability was used and why it existed
-4. **Post-exploitation / PrivEsc** — what access was achieved and how it was escalated
-5. **Real-world application** — how this vulnerability or technique appears in real engagements
-6. **Key takeaway** — one or two sentences on what this taught or reinforced
+1. **Objective**: what the target is and what success looks like
+2. **Enumeration**: what was found and how
+3. **Exploitation**: what vulnerability was used and why it existed
+4. **Post-exploitation / PrivEsc**: what access was achieved and how it was escalated
+5. **Real-world application**: how this vulnerability or technique appears in real engagements
+6. **Key takeaway**: one or two sentences on what this taught or reinforced
 
 ### Reporting Principles
 
-- Findings documented with evidence — commands run, output received, screenshots
-- Dead ends included — what was tried before the successful path
-- Technical detail accurate — if you don't know why something worked, say so and then find out
-- Real-world context connected — every finding maps to a genuine risk
+- Findings documented with evidence: commands run, output received, screenshots
+- Dead ends included: what was tried before the successful path
+- Technical detail accurate: if you don't know why something worked, say so and then find out
+- Real-world context connected: every finding maps to a genuine risk
 
 ---
 
@@ -433,7 +433,7 @@ This document reflects current methodology as of April 2026. It will be updated 
 - OSCP preparation introduces more advanced concepts
 - Real-world engagement experience informs what actually matters versus what's theoretical
 
-The gap between a beginner's methodology and an expert's methodology isn't the list of tools — it's the quality of thinking behind each step. That's what this document is really tracking.
+The gap between a beginner's methodology and an expert's methodology isn't the list of tools; it's the quality of thinking behind each step. That's what this document is really tracking.
 
 ---
 
