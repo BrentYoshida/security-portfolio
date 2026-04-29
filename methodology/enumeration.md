@@ -1,18 +1,18 @@
 # Enumeration Checklist
-**Status:** Living document — updated as methodology develops  
+**Status:** Living document:  updated as methodology develops  
 **Last Updated:** April 2026  
 
 ---
 
 ## Philosophy
 
-Enumeration is where engagements are won or lost. The vulnerability is almost always discovered during this phase — exploitation is just acting on what enumeration revealed. Rushing to exploitation before enumeration is complete is the most common reason people get stuck on machines and miss findings on real engagements.
+Enumeration is where engagements are won or lost. The vulnerability is almost always discovered during this phase; exploitation is just acting on what enumeration revealed. Rushing to exploitation before enumeration is complete is the most common reason people get stuck on machines and miss findings on real engagements.
 
 Run every applicable section before moving to Phase 3. Check each box before declaring enumeration complete.
 
 ---
 
-## Phase 1 — Initial Connectivity
+## Phase 1:  Initial Connectivity
 
 ```bash
 # Confirm host is live before running anything else
@@ -25,9 +25,9 @@ ping -c 4 [IP]
 
 ---
 
-## Phase 2 — Port Scanning
+## Phase 2:  Port Scanning
 
-### Step 1 — Quick initial scan
+### Step 1:  Quick initial scan
 
 ```bash
 nmap [IP]
@@ -36,7 +36,7 @@ nmap [IP]
 - [ ] Initial scan complete
 - [ ] Open ports noted
 
-### Step 2 — Full port scan (ALWAYS run this)
+### Step 2:  Full port scan (ALWAYS run this)
 
 ```bash
 nmap -p- [IP]
@@ -46,7 +46,7 @@ nmap -p- [IP]
 - [ ] Non-standard ports checked against initial scan
 - [ ] Any new ports discovered noted
 
-### Step 3 — Service version and script scan on discovered ports
+### Step 3:  Service version and script scan on discovered ports
 
 ```bash
 nmap -sV -sC -O -p [discovered ports] [IP]
@@ -62,7 +62,7 @@ nmap -sV -sC -O -p [discovered ports] [IP]
 nmap -sV -sC -oA recon/nmap_[target] [IP]
 ```
 
-### Step 4 — UDP scan
+### Step 4:  UDP scan
 
 ```bash
 sudo nmap -sU --top-ports 100 [IP]
@@ -73,11 +73,11 @@ sudo nmap -sU --top-ports 100 [IP]
 
 ---
 
-## Phase 3 — Service Enumeration
+## Phase 3:  Service Enumeration
 
 Work through every discovered service. Don't skip services that look uninteresting — context from one service frequently makes another exploitable.
 
-### Web (HTTP/HTTPS — ports 80, 443, 8080, 8443)
+### Web (HTTP/HTTPS:  ports 80, 443, 8080, 8443)
 
 ```bash
 # Technology fingerprinting
@@ -207,7 +207,7 @@ nc [IP] 25
 smtp-user-enum -M VRFY -U /usr/share/seclists/Usernames/top-usernames-shortlist.txt -t [IP]
 ```
 
-- [ ] Banner captured — software and version noted
+- [ ] Banner captured: software and version noted
 - [ ] User enumeration attempted
 
 ### SNMP (port 161 UDP)
@@ -225,7 +225,7 @@ snmpwalk -c private -v1 [IP]
 For any service not covered above:
 
 ```bash
-# Banner grab — works on almost any TCP service
+# Banner grab:  works on almost any TCP service
 nc [IP] [port]
 
 # Searchsploit for identified version
@@ -238,7 +238,7 @@ searchsploit [service] [version]
 
 ---
 
-## Phase 4 — Exploit Research
+## Phase 4:  Exploit Research
 
 Run after all services enumerated.
 
@@ -282,9 +282,9 @@ WEB:
   - Input fields: 
 
 CREDENTIALS ATTEMPTED:
-  - anonymous:anonymous — [result]
-  - admin:admin — [result]
-  - root:(blank) — [result]
+  - anonymous:anonymous:  [result]
+  - admin:admin:  [result]
+  - root:(blank):  [result]
 
 INTERESTING FINDINGS:
 
@@ -295,7 +295,7 @@ ATTACK VECTORS TO PURSUE:
 
 ## Rules
 
-**Never skip the full port scan.** Non-standard ports are where critical services hide. This has been demonstrated repeatedly — Redis on 6379 would have been missed by a default scan. Run `-p-` every time without exception.
+**Never skip the full port scan.** Non-standard ports are where critical services hide. This has been demonstrated repeatedly:  Redis on 6379 would have been missed by a default scan. Run `-p-` every time without exception.
 
 **Save all scan output.** `nmap -oA recon/nmap_[target]` on every scan. Reference the saved output rather than re-scanning. Re-scanning generates more log entries on monitored systems.
 
