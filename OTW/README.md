@@ -17,12 +17,12 @@ pentest application of the concept.
 | Level 7| Grep | April 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/Bandit/level-07.md) |
 | Level 8 | Sort & uniq -u | April 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/Bandit/level-08.md) |
 | Level 9 | Strings & Grep "==" | April 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/Bandit/level-09.md) |
-| Level 10 | ROT13 Decoding with tr | April 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/Bandit/level-10.md) |
-| Level 11 | Recursive Decompressiong: File, xxd, zcat, bzcat | May 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/commit/fa6d1fd25fb0942ccf42208c4cebfa4baeb90ff9) |
-| Level 12 | SSH Key Auth & Private Key Permissions | May 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/commit/8a5a838c010c8bce8fbd7481ce50f48f5ad089f3) |
-| Level 13 | Netcat and RAW TCP Socket Communication | May 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/commit/37c7e550ac76d72eef7bf007987759011de878bf) |
-| Level 14 | [Main Topic Title] | May 2026| [Link](https://github.com/BrentYoshida/security-portfolio/commit/af706faba8e1712cb8606147b132b611acd44eeb) |
-| Level 15 | [Main Topic Title]  | June 2026 | [Link]
+| Level 10 | Base64 Decode | April 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/Bandit/level-10.md) |
+| Level 11 | ROT13 Decoding with tr | May 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/commit/fa6d1fd25fb0942ccf42208c4cebfa4baeb90ff9) |
+| Level 12 | Recursive Decompression: xxd, zcat, bzcat, tar | May 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/commit/8a5a838c010c8bce8fbd7481ce50f48f5ad089f3) |
+| Level 13 | SSH Key Authentication and Private Key Permissions | May 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/commit/37c7e550ac76d72eef7bf007987759011de878bf) |
+| Level 14 | Raw TCP Socket Communication with Netcat | May 2026| [Link](https://github.com/BrentYoshida/security-portfolio/commit/af706faba8e1712cb8606147b132b611acd44eeb) |
+| Level 15 | SSL/TLS Tunnel with OpenSSL s_client  | June 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/level%2015) |
 | Level 16 | [Main Topic Title]  | June 2026 | [Link]
 | Level 17 | [Main Topic Title]  | June 2026 | [Link]
 | Level 18 | [Main Topic Title]  | June 2026 | [Link]
