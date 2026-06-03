@@ -7,9 +7,9 @@ About: Career changer pivoting to offensive security from 15 plus years in marke
 |------|--------|------|
 | Google Cybersecurity Certificate | Complete | April 2026 |
 | ISC2 CC (Certified in Cybersecurity) | Exam Pending | April 2026 |
-| CompTIA Security+ | In Progress | Est. May 2026 |
-| eJPT | Planned | Est. June 2026 |
-| OSCP | Planned | Est. Early 2027 |
+| CompTIA Security+ | In Progress | Est. June 2026 |
+| PNPT | Planned | Est. Aug 2026 |
+| OSCP | Planned | Est. Mid 2027 |
 
 ## Platforms
 - **HackTheBox**: 4 machines from Level 0 complete. Starting Level 1
