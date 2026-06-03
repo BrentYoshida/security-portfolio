@@ -1,1 +1,126 @@
+# Bandit Level 15 → Level 16
+**Platform:** OverTheWire — Bandit  
+**Date:** June 2026  
+**Concept:** SSL/TLS encrypted communication with OpenSSL s_client  
 
+---
+
+## Objective
+
+Retrieve the password for Level 16 by submitting the current level's password to a service listening on **port 30001** on localhost. The service requires **SSL/TLS encryption** — plaintext connection attempts will fail.
+
+---
+
+## Concepts Tested
+
+- SSL/TLS handshake mechanics and why plaintext tools fail against encrypted services
+- `openssl s_client` — establishing an interactive encrypted tunnel for manual testing
+- Localhost enumeration and internal service interaction from a post-exploitation shell
+- Environment selection and host firewall troubleshooting (real-world lab friction)
+
+---
+
+## Tools Used
+
+| Tool | Purpose |
+|------|---------|
+| `openssl s_client` | Establish SSL/TLS tunnel and submit credentials interactively |
+| `ssh` | Authenticate to the target level |
+| `nmap -sV` | Confirm port state and service fingerprint (optional verification step) |
+
+---
+
+## Methodology
+
+### Step 1 — Authenticate to the Level
+
+```bash
+ssh bandit15@bandit.labs.overthewire.org -p 2220
+```
+
+Accept the host fingerprint immediately. The server drops idle initialization connections — delaying the prompt causes a forced disconnect.
+
+---
+
+### Step 2 — Confirm the Listening Service
+
+Port 30001 is active on localhost. A banner grab confirms it expects a cryptographic handshake, not a plaintext string.
+
+**Why netcat fails here:**
+
+```bash
+nc localhost 30001
+# Submitting the password returns nothing — the service drops non-TLS input
+```
+
+A service enforcing SSL/TLS expects a `ClientHello` handshake as the first bytes of the connection. Raw string payloads from `nc` or `telnet` do not match that expected protocol structure and get dropped.
+
+---
+
+### Step 3 — Establish the Encrypted Tunnel
+
+```bash
+openssl s_client -connect localhost:30001
+```
+
+**What the output tells you:**
+
+- The full certificate chain, validity period and cipher suite are printed (`TLS_AES_256_GCM_SHA384` in this case)
+- The session halts at `read R BLOCK` — this is the tunnel confirming it is open and waiting for client input
+- This is not an error; it is the correct state
+
+---
+
+### Step 4 — Submit the Password and Retrieve the Flag
+
+With the tunnel open at the `read R BLOCK` prompt, paste the bandit15 password and press Enter.
+
+The service verifies the credential and returns the **Level 16 password**.
+
+---
+
+## What Failed First (and Why It Matters)
+
+**Host firewall blocking outbound port 2220:**  
+Initial SSH connection attempts from the guest VM (Kali, bridged mode) timed out silently. Ping to `8.8.8.8` confirmed the network stack was functional. The hang on a raw IP connection pointed to the Windows host firewall quietly dropping non-standard outbound ports. Fix was an explicit outbound rule via elevated PowerShell:
+
+```powershell
+New-NetFirewallRule -DisplayName "Allow Outbound Bandit SSH" -Direction Outbound -Protocol TCP -RemotePort 2220 -Action Allow
+```
+
+**Why WSL over bridged Kali for this level:**  
+WSL sits behind host NAT and has a minimal attack surface — no background listeners, no unnecessary exposure. For a task that only needs client tools, it is the cleaner choice. Bridged Kali treats the VM as a fully exposed physical node on the LAN, which adds complexity without benefit for this scope.
+
+---
+
+## Key Takeaways
+
+**`openssl s_client` is a diagnostic tool, not just a connection wrapper.**  
+It exposes certificate metadata that can leak high-value information in real engagements: software versions, internal Active Directory naming conventions, and administrative email aliases embedded in certificate fields. Get comfortable reading its output.
+
+**Internal services are a core post-exploitation target.**  
+In OSCP and PNPT labs, vulnerable services are frequently bound to `localhost` or `127.0.0.1` specifically to hide them from external scans. Enumerating and interacting with internal listeners from a compromised host is a foundational lateral movement skill.
+
+**Protocol mismatch is a real-world obstacle.**  
+Sending the right data through the wrong protocol gets you nothing. Confirming what a service actually expects before throwing tools at it — via `nmap -sV`, banner grabbing, or a quick `openssl` probe — saves time and avoids noisy failed attempts.
+
+---
+
+## Commands Reference
+
+```bash
+# Connect to the level
+ssh bandit15@bandit.labs.overthewire.org -p 2220
+
+# Optional: verify the port is listening
+nmap -sV -p 30001 localhost
+
+# Establish the SSL/TLS tunnel
+openssl s_client -connect localhost:30001
+
+# At the read R BLOCK prompt, paste the current level password and press Enter
+```
+
+---
+
+*OverTheWire Bandit — [github.com/BrentYoshida/security-portfolio](https://github.com/BrentYoshida/security-portfolio)*
