@@ -1,0 +1,58 @@
+PortSwigger Lab — Insecure Direct Object References (IDOR)
+Platform: PortSwigger Web Security Academy
+Difficulty: Apprentice
+Date: June 2026
+Concept: IDOR — accessing unauthorized resources by manipulating predictable object references
+
+Objective
+The lab simulates a shopping app with a live chat feature. Chat transcripts are stored as numbered files on the server. The goal is to access another user's transcript, retrieve a password they accidentally typed into the chat and use it to log in as that user.
+
+Concepts Tested
+
+IDOR — Insecure Direct Object Reference
+Sequential/predictable file naming as an attack vector
+Authorization bypass — accessing objects without ownership verification
+Manual parameter manipulation without tooling
+
+
+Tools Used
+ToolPurposeBrowserNavigate the app and manipulate URLs directly
+Note: In a real engagement this would be done with Burp Suite intercepting the download request to capture the exact endpoint and file reference. This lab was completed manually without Burp to demonstrate the core concept.
+
+Methodology
+Step 1 — Explore the Application
+Navigated to the live chat feature. The app connected me to a support agent and offered two options — Send a message or View transcript.
+
+Step 2 — Download My Own Transcript
+Clicked View transcript. The app downloaded a file called 2.txt — my chat transcript as the second user on the system.
+The filename immediately revealed two things:
+
+Transcripts are stored as sequentially numbered .txt files
+I am user 2, which means user 1 exists
+
+
+Step 3 — Access Another User's Transcript
+The download endpoint follows a predictable pattern:
+/download-transcript/2.txt
+Changed the reference from 2 to 1 by navigating directly to:
+https://[lab-id].web-security-academy.net/download-transcript/1.txt
+The server returned user 1's full chat transcript with no authorization check. Their password was visible in the transcript — they had typed it directly into the chat window.
+Retrieved password: wz4ksvh3tehazv1236s3
+
+Step 4 — Authenticate as the Target User
+Navigated to My account, logged in with:
+
+Username: carlos
+Password: wz4ksvh3tehazv1236s3
+
+Lab solved.
+
+Why This Works
+The server never verified that the requesting user owned the transcript they were trying to download. It trusted the filename in the URL and returned whatever file matched. There was no session check, no ownership validation, nothing tying the download request back to the authenticated user.
+The fix is straightforward — the server should verify that the user requesting transcript_id is the same user the transcript belongs to. File references should also not be sequential and guessable. UUIDs or signed tokens instead of 1.txt, 2.txt eliminate the enumeration risk entirely.
+
+Real-World Pentest Application
+This exact vulnerability pattern shows up constantly in production applications — invoice PDFs, medical records, order confirmations, support tickets, exported reports. Anywhere a file is generated per-user and stored with a predictable reference, IDOR is worth testing.
+The methodology is always the same: find an object reference (ID, filename, number), ask whether the server validates ownership before returning it, then test by modifying the reference to point at another user's object.
+In a real bug bounty engagement this would be a valid medium to high severity finding depending on the sensitivity of the data exposed. A chat transcript containing a password is high severity. An invoice showing a name and order total is medium. The impact drives the severity — the technique is identical.
+The next step in developing this skill is using Burp Suite to intercept the download request in real time rather than inferring the endpoint manually. Burp makes the full request visible — method, headers, path, parameters — and allows modification before the request hits the server.
