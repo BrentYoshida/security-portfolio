@@ -22,9 +22,9 @@ pentest application of the concept.
 | Level 12 | Recursive Decompression: xxd, zcat, bzcat, tar | May 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/commit/8a5a838c010c8bce8fbd7481ce50f48f5ad089f3) |
 | Level 13 | SSH Key Authentication and Private Key Permissions | May 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/commit/37c7e550ac76d72eef7bf007987759011de878bf) |
 | Level 14 | Raw TCP Socket Communication with Netcat | May 2026| [Link](https://github.com/BrentYoshida/security-portfolio/commit/af706faba8e1712cb8606147b132b611acd44eeb) |
-| Level 15 | SSL/TLS Tunnel with OpenSSL s_client  | June 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/level%2015) |
-| Level 16 | [Main Topic Title]  | June 2026 | [Link]
-| Level 17 | [Main Topic Title]  | June 2026 | [Link]
+| Level 15 | SSL/TLS Tunnel with OpenSSL s_client | June 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/level%2015) |
+| Level 16 | Port scanning, SSL/TLS service identification, RSA key authentication | June 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/level%2016)
+| Level 17 | File comparison with `diff`, SSH key authentication | June 2026 | [Link]
 | Level 18 | [Main Topic Title]  | June 2026 | [Link]
 | Level 19 | [Main Topic Title]  | June 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/level19)
 | Level 20 | [Main Topic Title]  | June 2026 | [Link]
