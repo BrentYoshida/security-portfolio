@@ -25,8 +25,8 @@ pentest application of the concept.
 | Level 15 | SSL/TLS Tunnel with OpenSSL s_client | June 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/level%2015) |
 | Level 16 | Port scanning, SSL/TLS service identification, RSA key authentication | June 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/level%2016)
 | Level 17 | File comparison with `diff`, SSH key authentication | June 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/level17)
-| Level 18 | [Main Topic Title]  | June 2026 | [Link]
-| Level 19 | [Main Topic Title]  | June 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/level19)
+| Level 18 | Bypassing a modified `.bashrc` by executing commands directly over SSH | June 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/level18)
+| Level 19 | SUID binary exploitation and privilege escalation via inherited execution context | June 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/level19)
 | Level 20 | [Main Topic Title]  | June 2026 | [Link]
 | Level 21 | [Main Topic Title]  | June 2026 | [Link]
 | Level 22 | [Main Topic Title]  | June 2026 | [Link]
