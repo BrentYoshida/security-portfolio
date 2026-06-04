@@ -26,4 +26,11 @@ pentest application of the concept.
 | Level 16 | [Main Topic Title]  | June 2026 | [Link]
 | Level 17 | [Main Topic Title]  | June 2026 | [Link]
 | Level 18 | [Main Topic Title]  | June 2026 | [Link]
+| Level 19 | [Main Topic Title]  | June 2026 | [Link]
+| Level 20 | [Main Topic Title]  | June 2026 | [Link]
+| Level 21 | [Main Topic Title]  | June 2026 | [Link]
+| Level 22 | [Main Topic Title]  | June 2026 | [Link]
+| Level 23 | [Main Topic Title]  | June 2026 | [Link]
+| Level 24 | [Main Topic Title]  | June 2026 | [Link]
 I'll continue to add as I go along
+
