@@ -1,0 +1,72 @@
+# Bandit Level 18 → Level 19
+**Platform:** OverTheWire — Bandit  
+**Date:** June 2026  
+**Concept:** Bypassing a modified `.bashrc` by executing commands directly over SSH  
+
+---
+
+## Objective
+
+The password for Level 19 is stored in a file called `readme` in the home directory. The complication: someone modified `.bashrc` to log you out the moment you authenticate. Every standard login attempt terminates immediately after the banner.
+
+---
+
+## Concepts Tested
+
+- How `.bashrc` works and when it executes during SSH login
+- SSH command execution — passing a command directly to the remote host without spawning an interactive shell
+- The difference between a login shell and a non-interactive command execution
+- Why `.bashrc` modifications are a realistic persistence and anti-forensics technique
+
+---
+
+## Tools Used
+
+| Tool | Purpose |
+|------|---------|
+| `ssh` | Connect to the remote host and execute a command directly |
+| `cat` | Read the `readme` file |
+
+---
+
+## Methodology
+
+### Step 1 — Understand the Problem
+
+Attempting a normal SSH login:
+
+```bash
+ssh bandit18@bandit.labs.overthewire.org -p 2220
+```
+
+Connects, shows the banner, then immediately disconnects. The modified `.bashrc` fires on login and kills the session before you can do anything.
+
+The key insight: `.bashrc` only runs when an interactive shell starts. If SSH executes a command directly — without ever spawning an interactive shell — `.bashrc` never runs.
+
+---
+
+### Step 2 — Execute the Command Directly Over SSH
+
+```bash
+ssh bandit18@bandit.labs.overthewire.org -p 2220 "cat ~/readme"
+```
+
+By appending the command in quotes after the SSH connection string, SSH connects, runs `cat ~/readme` on the remote host, prints the output locally and exits — the shell never initializes, `.bashrc` never fires.
+
+Password for Level 19: **cGWpMaKXVwDUNgPAVJbWYuGHVn9zl3j8**
+
+---
+
+## What Went Wrong
+
+Initial attempts were run from inside the bandit17 shell, which hits OTW's localhost SSH block. This command needs to run from your local machine — not from within an existing bandit session.
+
+---
+
+## Real-World Pentest Application
+
+This technique has direct offensive application. Defenders sometimes modify shell initialization files — `.bashrc`, `.bash_profile`, `.zshrc` — as a detection or disruption mechanism. Knowing that SSH can execute commands without triggering those files means you can still operate even in a tampered environment.
+
+More broadly, the ability to run commands on a remote host over SSH without an interactive session is something that comes up constantly in automation, lateral movement and data exfiltration. Tools like Ansible and Fabric are built on exactly this mechanism. Understanding it at the raw SSH level means you understand what's actually happening underneath those tools — and you can replicate it manually when you need to.
+
+`.bashrc` tampering is also worth logging as a defensive indicator. If you're doing blue team work or threat hunting, unexpected modifications to shell initialization files on a host are worth flagging. Attackers use the same technique in reverse — they modify `.bashrc` to execute a payload every time a legitimate user logs in.
