@@ -24,7 +24,7 @@ pentest application of the concept.
 | Level 14 | Raw TCP Socket Communication with Netcat | May 2026| [Link](https://github.com/BrentYoshida/security-portfolio/commit/af706faba8e1712cb8606147b132b611acd44eeb) |
 | Level 15 | SSL/TLS Tunnel with OpenSSL s_client | June 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/level%2015) |
 | Level 16 | Port scanning, SSL/TLS service identification, RSA key authentication | June 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/level%2016)
-| Level 17 | File comparison with `diff`, SSH key authentication | June 2026 | [Link]
+| Level 17 | File comparison with `diff`, SSH key authentication | June 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/level17)
 | Level 18 | [Main Topic Title]  | June 2026 | [Link]
 | Level 19 | [Main Topic Title]  | June 2026 | [Link](https://github.com/BrentYoshida/security-portfolio/blob/main/OTW/level19)
 | Level 20 | [Main Topic Title]  | June 2026 | [Link]
