@@ -1,0 +1,83 @@
+# Bandit Level 17 → Level 18
+**Platform:** OverTheWire — Bandit  
+**Date:** June 2026  
+**Concept:** File comparison with `diff`, SSH key authentication  
+
+---
+
+## Objective
+
+Two files exist in the home directory: `passwords.old` and `passwords.new`. Each contains 100 lines. One line was changed between them. That changed line — specifically the new version of it — is the password for Level 18.
+
+---
+
+## Concepts Tested
+
+- `diff` — comparing two files and interpreting the output
+- SSH key-based authentication using an RSA private key obtained in the previous level
+- File permission requirements for SSH private keys (`chmod 600`)
+- Understanding `diff` output notation: `<` means old, `>` means new
+
+---
+
+## Tools Used
+
+| Tool | Purpose |
+|------|---------|
+| `ssh -i` | Authenticate using RSA private key from Level 16 |
+| `diff` | Compare two files and surface the changed line |
+
+---
+
+## Methodology
+
+### Step 1 — Authenticate to the Level
+
+This level requires the RSA private key returned by Level 16. From a local terminal:
+
+```bash
+ssh -i ~/key.pem bandit17@bandit.labs.overthewire.org -p 2220
+```
+
+The key must have `chmod 600` permissions or SSH will refuse it.
+
+---
+
+### Step 2 — Compare the Files
+
+```bash
+diff /home/bandit17/passwords.old /home/bandit17/passwords.new
+```
+
+Output:
+
+```
+42c42
+< KxOU4IzbXM8j8HeAWPAXTd1eC77mp1qV
+---
+> x2gLTTjFwMOhQ8oWNbMN362QKxfRqGlO
+```
+
+Reading `diff` output:
+
+- `42c42` — line 42 changed between the old and new file
+- `<` — the old line (from `passwords.old`)
+- `>` — the new line (from `passwords.new`)
+
+The password for Level 18 is the `>` line: **x2gLTTjFwMOhQ8oWNbMN362QKxfRqGlO**
+
+---
+
+## What Went Wrong
+
+First attempt failed because I ran `diff` while still inside the bandit16 shell — that user doesn't have read access to bandit17's home directory. The command only works after authenticating as bandit17.
+
+Second attempt failed with a typo — the second path was missing the leading `/`, so it resolved as a relative path that didn't exist.
+
+---
+
+## Real-World Pentest Application
+
+`diff` is one of those tools that shows up constantly in ways that aren't obvious at first. During post-exploitation, comparing configuration files between a known-good baseline and a live system can surface backdoors, modified cron jobs or tampered service configs. If you exfiltrate two versions of a file and need to know what changed, `diff` is the fastest way to find it.
+
+The broader skill here is recognizing that 100 lines of nearly identical data is not something you manually eyeball — you automate the comparison. In real engagements the datasets are bigger. The habit of reaching for comparison tools instead of manual review is what keeps you efficient.
