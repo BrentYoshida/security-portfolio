@@ -1,0 +1,119 @@
+# Bandit Level 19 → Level 20
+**Platform:** OverTheWire — Bandit  
+**Date:** June 2026  
+**Concept:** SUID binary exploitation and privilege escalation via inherited execution context  
+
+---
+
+## Objective
+
+Retrieve the password for Level 20 by leveraging a SUID binary in the home directory that executes commands with elevated privileges on behalf of another user.
+
+---
+
+## Concepts Tested
+
+- SUID (Set User ID) — how special permission bits allow a binary to run as its owner rather than the invoking user
+- Permission bit analysis — reading `rws` vs `rwx` in `ls -la` output and understanding what `s` in the owner execute position indicates
+- Binary inspection — extracting embedded ASCII strings from a compiled ELF binary without a debugger
+- Privilege escalation via trusted binaries — the same class of technique used against misconfigured sudo rules, SUID shells, and GTFOBins entries in real engagements
+
+---
+
+## Tools Used
+
+| Tool | Purpose |
+|------|---------|
+| `ls -la` | Enumerate home directory and identify permission bits |
+| `cat` (against binary) | Surface embedded ASCII strings from compiled ELF output |
+| `./bandit20-do` | SUID binary — executes supplied command as bandit20 |
+| `ssh` | Authenticate to the target level |
+
+---
+
+## Methodology
+
+### Step 1 — Authenticate to the Level
+
+```bash
+ssh bandit19@bandit.labs.overthewire.org -p 2220
+```
+
+---
+
+### Step 2 — Enumerate the Home Directory
+
+```bash
+bandit19@bandit:~$ ls -la
+```
+
+```
+total 36
+drwxr-xr-x  2 root     root      4096 May  5 20:30 .
+drwxr-xr-x 70 root     root      4096 May  5 20:30 ..
+-rwsr-x---  1 bandit20 bandit19 14876 May  5 20:30 bandit20-do
+-rw-r--r--  1 root     root       220 May  5 20:30 .bash_logout
+-rw-r--r--  1 root     root      3771 May  5 20:30 .bash_profile
+-rw-r--r--  1 root     root       807 May  5 20:30 .profile
+```
+
+Two details flag immediately:
+
+- The `s` in the owner execute position (`-rwsr-x---`) confirms the **SUID bit is set**. Any authorized user running this binary executes it with the file owner's privileges — in this case, **bandit20**.
+- The `-do` suffix mirrors the naming convention of `sudo` (SuperUser Do), signaling the binary is designed to run commands as another user.
+
+---
+
+### Step 3 — Inspect the Binary
+
+Running `cat` against a compiled binary outputs raw machine code, but legible ASCII strings embedded in the ELF are still readable:
+
+```
+Run a command as another user.
+Example: %s whoami
+```
+
+The binary documents its own syntax: `[binary] [command]`.
+
+---
+
+### Step 4 — Verify Privilege Escalation
+
+Confirm the execution context shifts before reading the target file:
+
+```bash
+bandit19@bandit:~$ ./bandit20-do whoami
+bandit20
+```
+
+The returned identity is `bandit20` — escalation confirmed.
+
+---
+
+### Step 5 — Retrieve the Password
+
+OverTheWire stores level passwords at `/etc/bandit_pass/[username]`. The file is readable only by bandit20. With the SUID binary handling execution context, read it directly:
+
+```bash
+bandit19@bandit:~$ ./bandit20-do cat /etc/bandit_pass/bandit20
+```
+
+The output is the cleartext password for Level 20.
+
+---
+
+## Solution
+
+```bash
+ssh bandit20@bandit.labs.overthewire.org -p 2220
+```
+
+---
+
+## Real-World Pentest Application
+
+SUID misconfigurations are one of the most commonly exploited privilege escalation vectors on Linux systems. In a real engagement, post-exploitation enumeration tools like LinPEAS surface SUID binaries automatically — any binary with the `s` bit set that is not an OS default is an immediate investigation target.
+
+The `whoami` verification step mirrors how a tester confirms effective privilege before attempting sensitive reads or writes — you never assume escalation worked; you verify the execution context first. The same logic applies to `sudo -l` output, GTFOBins entries, and writable service binaries: read the permission bits, understand what the binary does as that user, then act.
+
+This level is a clean conceptual bridge to real privesc chains: SUID shell exploitation, `sudo` abuse with allowed commands, and misconfigured capabilities all follow the same core logic demonstrated here.
