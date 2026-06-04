@@ -1,0 +1,133 @@
+# Bandit Level 16 → Level 17
+**Platform:** OverTheWire — Bandit  
+**Date:** June 2026  
+**Concept:** Port scanning, SSL/TLS service identification, RSA key authentication  
+
+---
+
+## Objective
+
+Retrieve the credentials for Level 17 by submitting the current password to the correct port on localhost. The target port is somewhere in the range **31000–32000**. Multiple ports are open. Some speak SSL, some don't. Only one will return credentials — the rest either echo back whatever you send or refuse the connection entirely.
+
+---
+
+## Concepts Tested
+
+- Port scanning with `nmap` to identify open services in a range
+- SSL/TLS service fingerprinting — distinguishing encrypted from plaintext services
+- `openssl s_client` — initiating an encrypted session and interacting with it manually
+- RSA private key authentication — understanding that credentials aren't always passwords
+- SSH key file permissions and why they matter for authentication to succeed
+
+---
+
+## Tools Used
+
+| Tool | Purpose |
+|------|---------|
+| `nmap` | Scan port range 31000–32000 for open ports |
+| `openssl s_client` | Connect to SSL-speaking ports and submit credentials |
+| `ssh -i` | Authenticate to Level 17 using an RSA private key |
+
+---
+
+## Methodology
+
+### Step 1 — Authenticate to the Level
+
+```bash
+ssh bandit16@bandit.labs.overthewire.org -p 2220
+```
+
+Password from Level 15: `kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx`
+
+---
+
+### Step 2 — Scan the Port Range
+
+Manually probing 1000 ports is not realistic. `nmap` narrows it down fast.
+
+```bash
+nmap -p 31000-32000 --open localhost
+```
+
+This returned a handful of open ports — not all 1000. The `--open` flag filters out closed and filtered ports so you're only looking at what's actually listening.
+
+---
+
+### Step 3 — Identify SSL-Speaking Ports
+
+Not every open port speaks SSL. Connecting with `openssl s_client` on a non-SSL port fails immediately. For each candidate port:
+
+```bash
+openssl s_client -connect localhost:PORT -quiet 2>/dev/null
+```
+
+Ports that fail SSL negotiation drop instantly with errors like `no peer certificate available` or `Cipher is (NONE)`. Ports that complete the SSL handshake hang open waiting for input — that's the signal.
+
+Two ports completed SSL handshakes: **31518** and **31790**. Both showed `CN = SnakeOil` — a self-signed certificate, expected in a lab environment.
+
+---
+
+### Step 4 — Submit the Password
+
+For each SSL port that held the connection, I pasted the bandit16 password:
+
+```
+kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx
+```
+
+- Port **31518** — echoed the password back. Decoy.
+- Port **31790** — returned `Correct!` followed by an RSA private key block.
+
+```bash
+openssl s_client -connect localhost:31790 -quiet 2>/dev/null
+```
+
+---
+
+### Step 5 — Save the RSA Key and Authenticate
+
+The server returned a full RSA private key instead of a plaintext password. That key authenticates to Level 17.
+
+From a local Ubuntu terminal (not from within the bandit shell — OTW blocks localhost-to-localhost SSH):
+
+```bash
+cat > ~/key.pem
+# paste the full RSA key including BEGIN and END lines
+# press Ctrl+D to save
+chmod 600 ~/key.pem
+ssh -i ~/key.pem bandit17@bandit.labs.overthewire.org -p 2220
+```
+
+`chmod 600` is not optional. SSH refuses to use a private key if the file permissions are too open — this is an intentional security behavior, not a quirk.
+
+---
+
+## What Went Wrong
+
+The first `openssl` attempts failed because I used `connect` as a positional argument instead of the `-connect` flag, and formatted the host and port incorrectly. The correct syntax is:
+
+```bash
+openssl s_client -connect localhost:PORT
+```
+
+Not:
+
+```bash
+openssl s_client connect -localhost PORT
+```
+
+I also attempted to save the key inside the bandit16 shell and SSH back to localhost from within the server — that's blocked by OTW. The key has to be saved locally and SSH initiated from outside the server.
+
+On Windows, additional friction: CRLF line endings in the key file cause `error in libcrypto` and the key won't load. The fix is stripping Windows line endings before using the file. On Linux this is a non-issue.
+
+---
+
+## Real-World Pentest Application
+
+During internal network assessments, services are frequently running on non-standard ports. An attacker who only checks the top 1000 ports or only looks for HTTP/HTTPS will miss them. This level forces the habit of scanning full port ranges and fingerprinting what you find rather than assuming what's there.
+
+The SSL identification workflow here — scan, connect with `openssl s_client`, look for a completed handshake — is directly applicable to any engagement where you're probing internal services that may be encrypted. Knowing how to interact manually with SSL-wrapped services without a browser or proxy is a foundational skill.
+
+The RSA key delivery is also a realistic scenario. Not all credential material is a plaintext password. Knowing how to handle, store and use an RSA private key on the fly is something you'll do repeatedly in real engagements.
