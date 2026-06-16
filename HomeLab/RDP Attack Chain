@@ -1,0 +1,229 @@
+Home Lab: RDP Attack Chain
+
+Target: Windows 10 x64 (Build 19041) — Dell physical machine
+Attacker: Kali Linux 2026.2.5 — MSI laptop
+Date: 2026-05-28
+Scope: Authorized personal lab — written permission documented
+
+Objective
+Simulate a black-box attack scenario against a Windows target with no prior knowledge of
+credentials or username. Starting point: target IP and a known open port.
+
+Environment
+
+Role Machine OS
+Attacker MSI GT72 Kali Linux 2026.2.5
+Target Dell (Addlogix NIC) Windows 10 x64 Build 19041
+Network 192.168.8.0/24 Home lab via TP-Link managed switch
+
+Phase 1: Host Discovery
+Started with a ping sweep across the full home subnet to identify live hosts.
+
+      nmap -sn 192.168.1.0/24
+
+Lesson learned: Scan returned 14 live hosts but all showed 3389/tcp closed . Spent time
+troubleshooting before realizing the target was on a different subnet entirely. The Dell was
+on 192.168.8.0/24 , not 192.168.1.0/24 .
+
+Mistake: Assumed the subnet without verifying. Always confirm the target’s actual IP with
+ipconfig on the target machine before scanning.
+
+Phase 2: Service Identification
+Once the correct subnet was identified, ran a targeted service version scan against the
+target.
+      nmap -sV -p 3389 192.168.8.168
+
+Result:
+  PORT STATE SERVICE VERSION
+  3389/tcp open ms-wbt-server Microsoft Terminal Services
+  MAC Address: 00:12:96:05:2A:CD (Addlogix)
+  Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+RDP confirmed open on port 3389. OS fingerprinted as Windows. Hostname not yet known.
+Mistake: First attempt used 192.168.1.x with a literal x instead of a wildcard — nmap
+failed to resolve it. Corrected to 192.168.1.* then discovered the wrong subnet entirely.
+
+Phase 3: Username Enumeration
+With RDP confirmed, the next goal was username discovery without any credentials. Used
+enum4linux for SMB-based enumeration.
+
+      enum4linux -a 192.168.8.168
+
+Result:
+  Known Usernames: administrator, guest, krbtgt, domain admins, root, bin, none
+  [E] Can't find workgroup/domain
+  [E] Server doesn't allow session using username '', password ''
+
+Null sessions were blocked — Windows 10 default behavior. However, enum4linux still
+returned a known username list from the RID enumeration attempt before being cut off.
+
+Key finding: administrator confirmed as a valid username without any authentication.
+Lesson: Null session blocking stops full enumeration but does not prevent basic username
+leakage. This is why the built-in Administrator account should be renamed on hardened
+systems.
+
+Phase 4: Credential Attack — Attempt 1 (Hydra vs RDP)
+With administrator as the target username, attempted brute force directly against RDP
+using Hydra.
+
+      hydra -l administrator -P /usr/share/wordlists/rockyou.txt rdp://192.168.8.168 -t
+
+Errors encountered:
+First attempt failed — rockyou.txt had not been extracted from its gzip archive.
+    
+      sudo gunzip /usr/share/wordlists/rockyou.txt.gz
+
+Extracted successfully at 134MB. Reran Hydra.
+
+Result: Connection failures after 3 attempts. RDP throttled and dropped connections
+aggressively.
+
+  [ERROR] freerdp: The connection failed to establish.
+  [ERROR] all children were disabled due too many connection errors
+  0 of 1 target completed, 0 valid password found
+
+Reduced threads and added wait delay:
+
+      hydra -l administrator -P /usr/share/wordlists/rockyou.txt rdp://192.168.8.168 -t
+
+Still failed — RDP continued dropping connections after a handful of attempts.
+
+Lesson: RDP brute force is unreliable in practice. Modern Windows rate-limits and drops
+repeated RDP connections. This attack vector is noisy and largely ineffective against default
+Windows 10 targets. Real engagements obtain credentials from other sources first, then use
+them to RDP in.
+
+Mistake: Spent significant time fighting Hydra against RDP before pivoting to a better
+approach. Path of least resistance is SMB enumeration, not direct RDP brute force.
+
+Mistake: Repeatedly typed /usr/share/wordlist/rockyou.txt (missing the s ) across
+multiple attempts. Tab completion in the terminal would have prevented this entirely. Always
+use tab completion for file paths.
+
+Phase 5: Credential Attack — Attempt 2 (crackmapexec vs
+SMB)
+Pivoted from RDP to SMB as the credential attack surface. First confirmed SMB port status.
+
+      nmap -p 445 192.168.8.168
+
+Result: 445/tcp filtered — Windows firewall was blocking SMB.
+Enabled File and Printer Sharing on the target via admin PowerShell:
+
+      netsh advfirewall firewall set rule group="File and Printer Sharing" new enable=Yes
+
+Confirmed port status again:
+
+      nmap -p 445 192.168.8.168
+
+Result: 445/tcp open microsoft-ds — SMB now accessible.
+Created a targeted password list rather than running full rockyou against SMB:
+
+      echo -e "Password1\npassword\nlab123\nWelcome1\nAdmin123\nP@ssw0rd\npassword123"
+
+Ran crackmapexec:
+
+      crackmapexec smb 192.168.8.168 -u administrator -p quickpass.txt
+
+Result:
+    SMB 192.168.8.168 445 WIN-0E4NISQAKIM [*] Windows 10 / Server 2019 Build 19041 x64
+    SMB 192.168.8.168 445 WIN-0E4NISQAKIM [+] DESKTOP-9UBQVPR\administrator:Password1
+
+Valid credentials confirmed. Full admin access indicated by (Pwn3d!) .
+
+Additional recon from crackmapexec output:
+    Hostname: WIN-0E4NISQAKIM
+    Domain: DESKTOP-9UBQVPR
+    OS: Windows 10 / Server 2019 Build 19041 x64
+    SMB Signing: False (relevant for relay attacks)
+    SMBv1: False
+
+Lesson: crackmapexec returns significant target intelligence on a successful auth — OS,
+hostname, domain, and signing status — all from a single credential confirmation. This is
+why it is the preferred tool for credential validation over Hydra against RDP.
+
+
+Phase 6: Initial Access via RDP
+With valid credentials confirmed, connected to the target via RDP from Kali.
+
+      xfreerdp /u:administrator /p:Password1 /v:192.168.8.168 /cert-ignore
+
+Errors encountered:
+First xfreerdp attempt included +clipboard and /dynamic-resolution flags which caused
+a parse error on this Kali build:
+    [ERROR] Failed at index 6: Unexpected keyword
+
+Removed optional flags and connected with minimal syntax. Session established
+successfully.
+Result: Full graphical RDP session on Windows 10 target as Administrator.
+
+Phase 7: Post-Exploitation Enumeration
+
+Upon landing on the desktop, ran standard situational awareness commands.
+    whoami /all
+    net users
+    net localgroup administrators
+    ipconfig
+    systeminfo
+
+Located seeded lure files planted during lab setup — simulating credential and PII discovery
+during post-exploitation.
+
+
+Attack Chain Summary
+
+  Host Discovery (nmap ping sweep)
+  |
+  Service Identification (nmap -sV port 3389 = RDP open)
+  |
+  Username Enumeration (enum4linux = administrator confirmed)
+  |
+  SMB Port Confirmed Open (nmap port 445)
+  |
+  Credential Attack (crackmapexec = Password1 found)
+  |
+  Initial Access (xfreerdp RDP session as Administrator)
+  |
+  Post-Exploitation (whoami, net users, lure file discovery)
+
+Tools Used
+
+Tool Purpose
+  nmap              Host discovery, port scanning, service fingerprinting
+  enum4linux        SMB/RPC username enumeration
+  Hydra             RDP brute force (attempted, failed)
+  crackmapexec      SMB credential attack and validation
+  xfreerdp          RDP client for initial access
+  gunzip            Extracted rockyou.txt wordlist
+
+
+Key Lessons
+On methodology: Enumerate SMB before attacking RDP. Usernames leak from SMB even
+when null sessions are blocked. Valid usernames dramatically reduce the credential attack
+surface.
+
+On tooling: RDP brute force via Hydra is unreliable against modern Windows. SMB
+credential spraying via crackmapexec is faster, quieter, and more consistent. Match the tool
+to the protocol.
+
+On wordlists: Targeted password lists beat full rockyou for lab exercises and controlled 
+scenarios. In real engagements, common corporate passwords (Season+Year,
+CompanyName+123) are often more effective than raw dictionary attacks.
+
+On tab completion: Use it. Every time. File path typos ( wordlist vs wordlists ) cost
+significant time and are entirely preventable.
+
+On subnets: Confirm target IP before scanning. A target on the wrong subnet looks
+identical to a filtered or offline host.
+
+On HKLM vs HKCU: Registry edits to HKLM require elevated privileges. HKCU is per-user
+and does not. This distinction appears constantly in privilege escalation scenarios.
+
+References
+TCM Security — Practical Ethical Hacking
+GTFOBins
+crackmapexec documentation
+xfreerdp man page
+
+Lab conducted on personal hardware. 
+Written permission documented. 
+All activity contained within authorized home lab environment.
