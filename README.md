@@ -15,7 +15,7 @@ About: Career changer pivoting to offensive security from 15 plus years in marke
 - **HackTheBox**: 4 machines from Level 0 complete. Starting Level 1
 - **TryHackMe**: Jr. Penetration Tester path (in progress)
 - **OverTheWire**: Bandit Levels 0–20
-- **PortSwigger: Access Control
+- PortSwigger: Access Control
 
 ## Repository Structure
 | Folder | Contents |
