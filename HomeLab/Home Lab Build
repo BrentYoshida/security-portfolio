@@ -1,0 +1,234 @@
+Home Lab Build: Red Team Attack Platform and
+Target Environment
+Date: May 28, 2026
+Author: Brent Yoshida
+GitHub: github.com/BrentYoshida/security-portfolio
+
+Overview
+This documents the full build of a home red team lab from scratch in a single session. The
+lab consists of a bare-metal Kali Linux attack machine, a bare-metal Windows 10 Pro target
+machine, and an isolated lab network using a dedicated router and managed switch — all
+physically segmented from the home network.
+By end of session: attack machine successfully enumerated the target and established an
+authenticated RDP session.
+
+Lab Architecture
+
+Internet
+|
+Home Router (ISP)
+|
+GL-MT3000 Beryl AX (lab firewall/router — 192.168.8.1)
+|
+TP-Link TL-SG108E Managed Switch
+|
++--- MSI GT72VR (Kali Linux — 192.168.8.230) via WiFi
++--- Dell Latitude E6230 (Windows 10 Pro — 192.168.8.168) via ethernet
+
+The MT3000 acts as a network boundary between the home network and the lab. Devices
+behind it cannot reach home network devices. The lab runs on the 192.168.8.0/24 subnet.
+
+Hardware
+
+Machine Role OS IP
+MSI GT72VR 7RE Attack machine Kali Linux 2026.1 192.168.8.230
+Dell Latitude E6230 Target machine Windows 10 Pro (unpatched) 192.168.8.168
+GL.iNet GL-MT3000 Lab router/firewall GL.iNet OS (OpenWrt-based) 192.168.8.1
+TP-Link TL-SG108E Managed switch N/A N/A
+Attack machine specs: Intel Core i7 (7th gen), bare metal Kali Linux 2026.1, 256GB
+Samsung NVMe SSD
+Target machine specs: Intel Core i5-3320M @ 2.60GHz, 16GB RAM, 931GB HDD, Windows
+10 Pro build 10.0.19041
+
+Phase 1: Target Machine Build (Dell E6230)
+Objective
+Install bare-metal Windows 10 Pro as an intentionally vulnerable target machine with RDP
+enabled and weak credentials.
+Tools Used
+Microsoft Media Creation Tool
+Rufus 4.14
+Process
+1. Create bootable Windows USB
+Downloaded Windows 10 ISO via Media Creation Tool. Used Rufus 4.14 to write ISO to Lexar
+32GB USB with MBR partition scheme to support Legacy BIOS on the E6230.
+Key Rufus settings:
+Partition scheme: MBR
+Target system: BIOS or UEFI-CSM
+File system: FAT32
+2. Boot from USB
+
+Accessed Dell boot menu via F12 on startup. Selected USB Storage Device.
+3. Install Windows
+Selected Custom installation to wipe all existing partitions. Deleted all three existing
+partitions (System Reserved, Primary, OEM Reserved) leaving unallocated space. Installed
+Windows 10 Pro without a product key (unactivated is acceptable for lab use).
+4. Post-install configuration
+Created local account: labuser with intentionally weak password (lab target)
+Skipped Microsoft account
+Declined all privacy data collection settings
+Enabled Remote Desktop: Settings > System > Remote Desktop > On
+Disabled Windows Update to preserve unpatched attack surface
+Confirmed IP via ipconfig : 192.168.8.168
+
+Phase 2: Attack Machine Build (MSI GT72VR)
+Objective
+Install bare-metal Kali Linux 2026.1 as the primary attack platform.
+Tools Used
+Rufus 4.14
+Kali Linux 2026.1 Installer ISO (x86_64)
+Process
+1. Download Kali ISO
+Downloaded Kali Linux 2026.1 Installer (x86_64) from kali.org/get-kali.
+2. Create bootable USB
+Used Rufus 4.14 with MBR partition scheme. Rufus prompted to download matching Grub
+2.12 bootloader — selected Yes.
+3. Disable Secure Boot
+
+MSI BIOS blocked Kali with Secure Boot Violation error. Entered BIOS via Delete key on
+startup. Navigated to Security tab, disabled Attempt Secure Boot. Changed Boot mode from
+UEFI to Legacy to resolve NVRAM volume full error with MOK keys.
+4. Install Kali
+Booted from USB in Legacy/BIOS mode. Selected Graphical Install (text installer ran due to
+timing but functioned identically).
+Key installation decisions:
+Hostname: kali
+Username: kali
+Partition: Guided, use entire disk on /dev/nvme0n1 (256GB Samsung NVMe)
+Partition scheme: All files in one partition
+Desktop: Xfce (default) with top10 and default tool collections
+GRUB installed to /dev/nvme0n1
+5. Post-install configuration
+After first boot, configured the system:
+
+Connected to home WiFi temporarily via nmtui to perform updates. Switched to lab
+network (Home Lab 5G) post-configuration.
+# Fix APT sources
+echo "deb http://http.kali.org/kali kali-rolling main non-free contrib" | sudo tee /etc/apt/sources.list
+# Fix DNS
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+# Lock DNS to prevent NetworkManager from overwriting
+sudo chattr +i /etc/resolv.conf
+# Full system update
+sudo apt update && sudo apt full-upgrade -y
+# Enable SSH
+sudo systemctl enable ssh
+sudo systemctl start ssh
+# Clean up
+sudo apt autoremove -y
+
+Final IP on lab network: 192.168.8.230 (wlan0)
+
+Phase 3: Lab Network Build
+Objective
+Create an isolated lab network that separates target machines from the home network while
+allowing the attack machine to reach both the lab and the internet.
+Hardware
+GL.iNet GL-MT3000 Beryl AX (lab router)
+TP-Link TL-SG108E 8-port managed switch
+Cat6 ethernet cables
+Network Design
+
+MT3000 Configuration
+Accessed MT3000 admin panel at 192.168.8.1 after connecting via ethernet. Created two
+WiFi networks:
+Home Lab 2G (2.4GHz)
+Home Lab 5G (5GHz)
+Both networks assigned strong unique passwords. MT3000 issues DHCP addresses in the
+192.168.8.0/24 range.
+Why This Architecture
+The MT3000 acts as a NAT firewall. Devices on the 192.168.8.x network cannot initiate
+Home Router
+|
++--- [ethernet] --- MT3000 WAN port
+|
+MT3000 LAN port --- [ethernet] --- TP-Link Switch Port 1
+|
+Port 2: E6230 (ethernet)
+MSI connects wirelessly to MT3000 lab WiFi (Home Lab 5G)
+
+connections to the 192.168.1.x home network. This prevents an exploited target from
+pivoting to personal devices — phones, Q’s laptop, smart home devices. The attack machine
+connects wirelessly to the lab network, mirroring a real engagement where an operator
+connects into a target network remotely.
+
+Phase 4: Reconnaissance and Initial Access
+
+Target
+Dell E6230 running Windows 10 Pro at 192.168.8.168
+Tools Used
+nmap 7.99
+xfreerdp
+Network Discovery
+nmap -sn 192.168.8.0/24
+
+Identified all live hosts on the lab network. Confirmed E6230 at 192.168.8.168.
+Port Scan — RDP Verification
+
+nmap -p 3389 192.168.8.168
+Result:
+PORT STATE SERVICE
+3389/tcp open ms-wbt-server
+
+Full Port and Service Enumeration
+
+nmap -sV -sC -p- 192.168.8.168
+
+Result:
+
+PORT STATE SERVICE VERSION
+3389/tcp open ms-wbt-server Microsoft Terminal Services
+
+7680/tcp open pando-pub
+Intelligence gathered from nmap scripts:
+OS: Windows 10 (build 10.0.19041)
+Computer name: DESKTOP-9UBQVPR
+Domain: WIN-0E4NISQAKIM (standalone, not domain-joined)
+RDP SSL certificate: CN=DESKTOP-9UBQVPR, valid May-November 2026
+NetBIOS name: WIN-0E4NISQAKIM
+RDP Authentication
+
+xfreerdp /u:labuser /p:[password] /v:192.168.8.168 /cert-ignore
+
+Result: Successful authentication. Full Windows 10 desktop obtained via RDP session from
+Kali attack machine.
+
+Key Lessons Learned
+Legacy vs UEFI matters. The E6230 runs Legacy BIOS, requiring MBR partition scheme on
+the USB. The MSI runs UEFI but was switched to Legacy mode to resolve Secure Boot MOK
+NVRAM issues with Kali.
+DNS can break silently. NetworkManager overwrites /etc/resolv.conf on network changes.
+Locking it with chattr +i prevents silent breakage during apt operations.
+RDP is loud. Connecting via standard RDP kicks the active console session off the target —
+an obvious indicator. Shadow sessions ( /shadow:1 /noconsentprompt ) are required for
+stealth in real engagements.
+Network isolation is non-negotiable. An unpatched Windows machine should never sit on
+the same network as personal devices. The MT3000 provides the boundary that makes safe
+lab operation possible.
+
+Current Lab Status
+
+Component Status
+
+Kali attack machine Operational
+Windows 10 target Operational
+Lab network isolation Operational
+SSH on Kali Enabled and persistent
+RDP on target Open, confirmed reachable
+First RDP session Successful
+
+Next Steps
+Run post-exploitation enumeration inside the RDP session
+Set up Active Directory on Lenovo LOQ (VM host) with E6230 as domain-joined
+workstation
+Practice lateral movement and privilege escalation
+Begin structured TryHackMe rooms aligned with PNPT curriculum
+Configure TP-Link switch VLANs for network segmentation practice
+
+Cert Roadmap Context
+This lab build supports the following certification path:
+Security+ SY0-701 (in progress) > PNPT > OSCP > CRTO > OSEP
+Hands-on lab work directly reinforces Security+ domains 1 (Threats) and 4 (Operations)
+while building the practical foundation required for PNPT’s practical exam format.
+
+Lab build completed in a single session. All testing performed on personally owned
+hardware on a privately owned isolated network.
