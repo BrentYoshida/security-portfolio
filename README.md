@@ -6,15 +6,15 @@ About: Career changer pivoting to offensive security from 15 plus years in marke
 | Cert | Status | Date |
 |------|--------|------|
 | Google Cybersecurity Certificate | Complete | April 2026 |
-| ISC2 CC (Certified in Cybersecurity) | Exam Pending | April 2026 |
-| CompTIA Security+ | In Progress | Est. June 2026 |
-| PNPT | Planned | Est. Aug 2026 |
+| ISC2 CC (Certified in Cybersecurity) | Exam Pending | May 2026 |
+| CompTIA Security+ | In Progress | Est. July 2026 |
+| PNPT | Planned | Est. Oct 2026 |
 | OSCP | Planned | Est. Mid 2027 |
 
 ## Platforms
 - **HackTheBox**: 4 machines from Level 0 complete. Starting Level 1
 - **TryHackMe**: Jr. Penetration Tester path (in progress)
-- **OverTheWire**: Bandit Levels 0–13
+- **OverTheWire**: Bandit Levels 0–20
 
 ## Repository Structure
 | Folder | Contents |
