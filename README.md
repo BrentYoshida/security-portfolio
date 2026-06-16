@@ -12,10 +12,11 @@ About: Career changer pivoting to offensive security from 15 plus years in marke
 | OSCP | Planned | Est. Mid 2027 |
 
 ## Platforms
+- **OverTheWire**: Bandit Levels 0–20
+- **Home Lab**: Home lab build to legally practice on own equipment
 - **HackTheBox**: 4 machines from Level 0 complete. Starting Level 1
 - **TryHackMe**: Jr. Penetration Tester path (in progress)
-- **OverTheWire**: Bandit Levels 0–20
-- PortSwigger: Access Control
+- **PortSwigger**: Access Control
 
 ## Repository Structure
 | Folder | Contents |
@@ -28,6 +29,7 @@ About: Career changer pivoting to offensive security from 15 plus years in marke
 | `/notes` | Concept notes, cheatsheets, tool references |
 | `/bug-bounty` | Bug bounty reports and recon notes |
 | `/PortSwigger` | Port Swigger |
+| `/HomeLab` | Home Lab Build |
 
 
 ## Current Focus
