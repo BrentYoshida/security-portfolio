@@ -6,8 +6,8 @@ About: Career changer pivoting to offensive security from 15 plus years in marke
 | Cert | Status | Date |
 |------|--------|------|
 | Google Cybersecurity Certificate | Complete | April 2026 |
-| ISC2 CC (Certified in Cybersecurity) | Exam Pending | May 2026 |
 | CompTIA Security+ | In Progress | Est. July 2026 |
+| ISC2 CC (Certified in Cybersecurity) | Coursework Completed in May, Focusing on Sec+ then taking first ISC2 exam | Aug 2026 |
 | PNPT | Planned | Est. Oct 2026 |
 | OSCP | Planned | Est. Mid 2027 |
 
